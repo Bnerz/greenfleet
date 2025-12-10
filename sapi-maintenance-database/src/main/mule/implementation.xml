@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sapi-get-maintenance-flow" doc:id="94c5a023-40a3-40c2-855b-3670ca4ec6be" >
+		<db:select doc:name="GET /vehicles" doc:id="fd1750b2-7bd3-47d7-a43d-6770c996d332" config-ref="greendb_Config" >
+			<db:sql ><![CDATA[SELECT * FROM maintenance;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="e0cdf247-26ae-4927-b807-aa7241d5c4c9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+(payload orderBy ((item) -> item.id)) 
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sapi-get-maintenance-id-flow" doc:id="b275538c-b174-4d17-9770-45d646c35c99" >
+		<db:select doc:name="GET /maintenance-by-id" doc:id="c0fddb23-1ffe-45a0-9806-75f1433b9d3a" config-ref="greendb_Config" >
+			<db:sql ><![CDATA[SELECT * FROM maintenance WHERE id = :id;]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{id: attributes.uriParams.id}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="a33edef4-add3-4452-96b5-496b8546f149" >
+			<ee:variables >
+				<ee:set-variable variableName="id" ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1" doc:id="2e8a7dea-5c18-4deb-a795-2a4d13fcdfaf" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sapi-get-maintenance-vehicle-id-flow" doc:id="84aab01f-eee4-4df6-b693-829175269274" >
+		<db:select doc:name="GET /maintenance by id vehicle" doc:id="86cc42a9-5bba-4db9-87e6-e8ce08a6d76e" config-ref="greendb_Config" >
+			<db:sql ><![CDATA[SELECT * FROM maintenance
+WHERE vehicle_id = :id]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{id: attributes.uriParams.vehicle_id}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="a107c88f-4897-4554-9a4b-aee9caa0dd40" >
+			<ee:variables >
+				<ee:set-variable variableName="vehicle_id" ><![CDATA[attributes.uriParams.'vehicle_id']]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1" doc:id="3371efd6-4f96-4104-b54f-257d0318c490" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if (!isEmpty(payload))
+payload[0]
+else
+"get maintenance by id error"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="8a88c590-575a-4953-a22b-4025665b7218" message="get:\vehicles\(vehicle_id)\maintenance:sapi-maintenance-database-config" />
+	</sub-flow>
+	<sub-flow name="sapi-post-maintenance-flow" doc:id="fcc69c3c-b4c9-4dc0-8beb-172ce82af6f7" >
+		<ee:transform doc:name="Transform Message" doc:id="1af4ae22-d801-46c5-a9e9-5723e9ea19e8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{	
+	id: payload.id,
+	vehicle_id: payload.vehicle_id,
+	description: payload.description,
+	status: payload.status
+}
+
+
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:insert doc:name="POST /Createmaintenance" doc:id="880bc8b9-dac3-46b3-9cc4-d2cb287ed827" config-ref="greendb_Config" >
+			<db:sql ><![CDATA[INSERT INTO maintenance (id, vehicle_id, description, status, date)
+VALUES (:id, :vehicle_id, :description, :status, NOW())
+]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+id: payload.id,
+vehicle_id: payload.vehicle_id, 
+description: payload.description,
+status: payload.status
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message1" doc:id="9a427eef-984b-4473-906a-669fe984f2aa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Maintenance created",
+  status: 201
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>

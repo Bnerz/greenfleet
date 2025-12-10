@@ -1,0 +1,11 @@
+%dw 2.0
+
+type auto_1f56b75f_b872_40fd_aa03_08b16ae4eb89_Output_Payload = {
+  description: String, 
+  id?: String, 
+  created_date?: String, 
+  vehicle_id: String, 
+  status?: "scheduled" | "in progress" | "completed", 
+  _?: Any
+} {"description": "Representa um pedido de manutenção associado a um veículo."}
+

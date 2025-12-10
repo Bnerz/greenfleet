@@ -1,0 +1,8 @@
+%dw 2.0
+
+type auto_fc5f5ac8_eb7f_4d8b_a31e_53f5df4249b1_Output_Payload = Array<{  country?: String,   name: String,   vehicles?: Array<{    account_id?: String,     model: String,     id?: String,     category?: String,     brand: String,     status?: String,     _?: Any  } {"description": "Estrutura base para veículos geridos pela GreenFleet Solutions. Inclui informação de marca, modelo e estado operacional atual."}>, 
+  industry?: String, 
+  id?: String, 
+  _?: Any
+} {"description": "Representa uma conta de cliente na GreenFleet Solutions. Pode incluir veículos associados."}>
+

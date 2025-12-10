@@ -1,0 +1,12 @@
+%dw 2.0
+
+type auto_0cb09976_48ea_4d5e_90fb_e7750cee749d_Input_Payload = {
+  account_id?: String, 
+  model: String, 
+  id?: String, 
+  category?: String, 
+  brand: String, 
+  status?: String, 
+  _?: Any
+} {"description": "Estrutura base para veículos geridos pela GreenFleet Solutions.\nInclui informação de marca, modelo e estado operacional atual.\n"}
+

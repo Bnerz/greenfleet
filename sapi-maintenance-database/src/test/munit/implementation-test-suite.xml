@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="implementation-test-suite.xml" />
+	<munit:test name="implementation-test-suite-sapi-get-maintenance-vehicle-id-flowTest" doc:id="cb14b779-e20f-492d-ba64-9b856a9a7f2e" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sapi-get-maintenance-vehicle-id-flow" doc:id="e8a30a39-947f-4fdd-97d3-7368063fa079" name="sapi-get-maintenance-vehicle-id-flow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="implementation-test-suite-sapi-get-maintenance-flowTest" doc:id="91aa3392-a130-4aa5-a784-4147fe4241c1" description="Test">
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to sapi-get-maintenance-flow" doc:id="d367c6ac-0fc2-4b45-893f-21a6cba9cb35" name="sapi-get-maintenance-flow"/>
+		</munit:execution>
+	</munit:test>
+
+
+</mule>

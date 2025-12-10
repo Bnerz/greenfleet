@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+
+
+	<flow name="eapi-greenfleet-solutions-main">
+		<http:listener
+			config-ref="eapi-greenfleet-solutions-httpListenerConfig"
+			path="/api/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body><![CDATA[#[payload]]]></http:body>
+				<http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:router
+			config-ref="eapi-greenfleet-solutions-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:BAD_REQUEST">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Bad request"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">400
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:METHOD_NOT_ALLOWED">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Method not allowed"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">405
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_ACCEPTABLE">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not acceptable"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">406
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate
+				type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Unsupported media type"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">415
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+			<on-error-propagate type="APIKIT:NOT_IMPLEMENTED">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Not Implemented"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">501
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="eapi-greenfleet-solutions-console">
+		<http:listener
+			config-ref="eapi-greenfleet-solutions-httpListenerConfig"
+			path="/console/*">
+			<http:response
+				statusCode="#[vars.httpStatus default 200]">
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:response>
+			<http:error-response
+				statusCode="#[vars.httpStatus default 500]">
+				<http:body>#[payload]</http:body>
+				<http:headers>#[vars.outboundHeaders default {}]</http:headers>
+			</http:error-response>
+		</http:listener>
+		<apikit:console
+			config-ref="eapi-greenfleet-solutions-config" />
+		<error-handler>
+			<on-error-propagate type="APIKIT:NOT_FOUND">
+				<ee:transform doc:name="Transform Message">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="httpStatus">404
+						</ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+	<flow name="get:\accounts:eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="4144075c-2a72-40cd-94b1-fabfff32b17a"
+			name="eapi-get-account-flow" />
+	</flow>
+	<flow name="get:\accounts\(id):eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="259282c0-ec39-4f7c-85ae-ef4f4875426e"
+			name="eapi-get-account-id-flow" />
+	</flow>
+	<flow
+		name="get:\accounts\(id)\vehicles:eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="68a8d351-d665-4c3f-80a3-a83351f350d8"
+			name="eapi-get-account-id-vehicle" />
+	</flow>
+	<flow name="get:\maintenance:eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="c072982f-4ce6-4aec-96db-861efa016c47"
+			name="eapi-get-maintenance-flow" />
+	</flow>
+	<flow
+		name="get:\maintenance\(id):eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference" doc:id="346d9ffa-12de-4179-9bd6-27f0fe35c512" name="eapi-get-maintenance-id"/>
+    </flow>
+	<flow name="get:\vehicles:eapi-greenfleet-solutions-config">
+		<logger level="INFO"
+			message="get:\vehicles:eapi-greenfleet-solutions-config" />
+	</flow>
+	<flow name="get:\vehicles\(id):eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="ea056142-d467-446e-8cee-fe08a063ff81" name="eapi-get-vehicle-id" />
+	</flow>
+	<flow
+		name="post:\accounts:application\json:eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="2fe9ea09-5525-4474-a8ed-9dd2a4986f20"
+			name="eapi-post-accounts" />
+	</flow>
+	<flow
+		name="post:\maintenance:application\json:eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference"
+			doc:id="b74870de-ccd9-47d0-a0c5-cbc75767717b"
+			name="eapi-post-maintenance" />
+	</flow>
+	<flow
+		name="post:\vehicles:application\json:eapi-greenfleet-solutions-config">
+		<flow-ref doc:name="Flow Reference" doc:id="eef1765b-c59b-47c7-adfd-b84885c47a0e" name="eapi-post-vehicles"/>
+    </flow>
+</mule>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="eapi-get-account-flow" doc:id="fc5f5ac8-eb7f-4d8b-a31e-53f5df4249b1" >
+		<logger level="INFO" doc:name="Logger" doc:id="f931a7f8-d4ad-41ae-b841-d217164db0df" message="Get account from papi account" />
+		<http:request method="GET" doc:name="GET /accounts" doc:id="b9f89ecb-68f6-438c-b2be-13b88f4bebcc" config-ref="HTTP_Request_configuration" path="/api/accounts" >
+		</http:request>
+	</sub-flow>
+	<sub-flow name="eapi-get-account-id-flow" doc:id="2de80245-53f6-491a-aa32-040eae61806e" >
+		<logger level="INFO" doc:name="Logger" doc:id="618a45c0-23c8-45a0-8a4b-7a2e1b9a9d81" message="Get papi account id" />
+		<http:request method="GET" doc:name="Get /accounts/id" doc:id="d27d70d5-dbae-44f1-beec-eb0ef32c746c" config-ref="HTTP_Request_configuration" path="/api/accounts/{id}" >
+			<http:body ><![CDATA[#[%dw 2.0
+output application/json
+---
+payload]]]></http:body>
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	"Key" : "Value",
+	id : attributes.uriParams.'id'
+}]]]></http:uri-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="eapi-vehicle" doc:id="2df0debf-9ea3-4e2c-aa75-f8b27e537367">
+		<logger level="INFO" doc:name="Logger" doc:id="bd39eaa3-a696-45e1-9f29-0f5fe67ca6fc" message="eapi get vehicle" />
+		<http:request method="GET" doc:name="Request" doc:id="c55e15de-d82d-4ac4-bf82-07517ba9f308" config-ref="HTTP_Request_configuration" path="/api/vehicles/" />
+	</sub-flow>
+	<sub-flow name="eapi-get-account-id-vehicle" doc:id="170f930c-2d7e-4f6f-ae38-cc00ebfbcaa3" >
+		<logger level="INFO" doc:name="Logger" doc:id="a3e02b85-f063-424d-8c85-dc588a2ec986" message="eapi get account id vehicle" />
+		<http:request method="GET" doc:name="GET / accounts/id/vehicles" doc:id="68ac2779-6d0c-4be7-874e-fabfc3310a9a" config-ref="HTTP_Request_configuration" path="/api/accounts/{id}/vehicles" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	id : attributes.uriParams.'id'
+}]]]></http:uri-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="eapi-get-maintenance-flow" doc:id="db07d337-27c4-494f-97d2-50697a0b3ec0" >
+		<logger level="INFO" doc:name="Logger" doc:id="f0a0f5f2-89b6-4941-84a2-0e1151974b21" />
+		<http:request method="GET" doc:name="GET /maintenance" doc:id="7879b994-28a2-4286-bb5c-6f6a932f33cc" config-ref="HTTP_Request_configuration" path="/api/maintenance" />
+	</sub-flow>
+	<sub-flow name="eapi-get-maintenance-id" doc:id="6972ae94-0092-488c-ac1e-879d81aad3fe" >
+		<logger level="INFO" doc:name="Logger" doc:id="49982668-69eb-4f7a-b224-f3270c2f6a1d" message="Get eapi maintenance id" />
+		<http:request method="GET" doc:name="GET /maintenance/id" doc:id="5fb129e7-c1ca-4842-b92a-3eb7108cf270" config-ref="HTTP_Request_configuration" path="/api/get/maintenance/{id}" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	id : attributes.uriParams.'id'
+}]]]></http:uri-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="eapi-get-vehicle-id" doc:id="a52340bb-bbff-4f24-a959-0b0597fc921e" >
+		<logger level="INFO" doc:name="Logger" doc:id="942c71c9-84fd-4275-944f-6484b4598128" message="eapi get vehicle id" />
+		<http:request method="GET" doc:name="Request" doc:id="69ea18e0-6509-4a90-b8d9-0421592b4ec4" config-ref="HTTP_Request_configuration" path="/api/vehicles/id" >
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	id : attributes.uriParams.'id'
+}]]]></http:uri-params>
+		</http:request>
+	</sub-flow>
+	<sub-flow name="eapi-post-accounts" doc:id="235f49ac-770b-4b2b-bd17-af88514f0fe5" >
+		<ee:transform doc:name="Transform Message" doc:id="1e8a1e3d-5b24-4096-a035-5b7597ff2772" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="696a427d-d7fb-4d61-93eb-effba903c997" config-ref="HTTP_Request_configuration" path="/api/accounts"/>
+	</sub-flow>
+	<sub-flow name="eapi-post-maintenance" doc:id="1f56b75f-b872-40fd-aa03-08b16ae4eb89" >
+		<ee:transform doc:name="Transform Message" doc:id="046d9f43-9808-481c-98e3-16da4a878006" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="aeefa429-b47a-460d-8da2-ac05534e5c56" config-ref="HTTP_Request_configuration" path="/api/maintenance"/>
+	</sub-flow>
+	<sub-flow name="eapi-post-vehicles" doc:id="2c4166d0-b333-4f89-912c-165c3880e169" >
+		<ee:transform doc:name="Transform Message" doc:id="0028a68f-8464-4a9b-9849-7e3541ab7e67" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<http:request method="POST" doc:name="Request" doc:id="cb2c5b9c-859f-4127-b586-05add402b3e7" config-ref="HTTP_Request_configuration" path="/api/vehicles"/>
+	</sub-flow>
+</mule>

@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<sub-flow name="sapi-get-account-flow"
+		doc:id="ba947aa0-b886-40c9-b956-947ae9799eef">
+		<db:select doc:name="GET /accounts"
+			doc:id="d5907855-cc4a-4956-a90c-5035a796cc0d"
+			config-ref="accountdb_Config" queryTimeout="30000">
+			<db:sql><![CDATA[Select * FROM accounts;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message"
+			doc:id="54df02ab-bfed-4cd8-9e20-0c580426faf3">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sapi-get-account-id-flow"
+		doc:id="3404be4d-1938-4d50-8d3d-db6e139ccde8">
+		<db:select doc:name="GET /Account By Id"
+			doc:id="db5054ae-ffa5-4da7-8e94-fc23a83c2077"
+			config-ref="accountdb_Config">
+			<db:sql><![CDATA[SELECT id, name, industry, country FROM accounts WHERE id = :id;]]></db:sql>
+			<db:input-parameters><![CDATA[#[{id: attributes.uriParams.id}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message"
+			doc:id="9f682c25-4596-406a-90fe-7e74450e8336">
+			<ee:variables>
+				<ee:set-variable variableName="id"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1"
+			doc:id="23251cba-eafe-4cc5-aab9-3118e3f1c0dd">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(payload) > 0)
+payload[0]
+else
+"get account by id error"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sapi-get-account-id-vehicle-flow"
+		doc:id="39556503-9e9c-4d6b-8823-1ad5e6530061">
+		<db:select doc:name="GET /Account By Id"
+			doc:id="b03a7ef7-f117-4885-88f3-d34662d37544"
+			config-ref="accountdb_Config">
+			<db:sql><![CDATA[SELECT id, name, industry, country FROM accounts WHERE id = :id;]]></db:sql>
+			<db:input-parameters><![CDATA[#[{id: attributes.uriParams.id}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message"
+			doc:id="85d3dd98-852d-476b-8761-0c771d1652b6">
+			<ee:variables>
+				<ee:set-variable variableName="id"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1"
+			doc:id="8ecd025b-a03a-42bb-b36b-50b29d3f69a4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(payload) > 0)
+payload[0]
+else
+"get account by id error"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</sub-flow>
+	<sub-flow name="sapi-get-veicles-flow"
+		doc:id="171d72c4-efd9-4851-9ccc-46258dee8b11">
+		<db:select doc:name="GET /all vehicles"
+			doc:id="deefab39-0318-4376-8471-8c66d73426a9"
+			config-ref="accountdb_Config">
+			<db:sql><![CDATA[SELECT * FROM vehicles;]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message"
+			doc:id="753278fd-0a3c-4d05-8b52-e0c24dcc5fe0">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(payload) > 0)
+payload
+else
+"get vehicles by id error"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger"
+			doc:id="dd72393c-9f3d-4c68-b12c-fedc1b4fe537"
+			message="get:\vehicles:sapi-account-database-config" />
+	</sub-flow>
+	<sub-flow name="sapi-get-veicles-id-flow"
+		doc:id="63985010-9ad7-436b-a92a-6ac02bf0360f">
+		<db:select doc:name="GET /vehicle by id"
+			doc:id="306b0b94-5e24-4801-9e23-59a4925bf942"
+			config-ref="accountdb_Config">
+			<db:sql><![CDATA[SELECT * FROM vehicles WHERE id = :id;]]></db:sql>
+			<db:input-parameters><![CDATA[#[{id: attributes.uriParams.id}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message"
+			doc:id="8256d9c8-e5bd-4ea4-9519-e0be04adb690">
+			<ee:variables>
+				<ee:set-variable variableName="id"><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message1"
+			doc:id="7d62906a-9eaf-4c76-8d2f-d07b8852bf36">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+if (sizeOf(payload) > 0)
+payload[0]
+else
+"get maintenance by id error"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger"
+			doc:id="2c394487-feff-4ea8-956b-4f8a317cd759"
+			message="get:\vehicles\(id):sapi-account-database-config" />
+	</sub-flow>
+	<!-- <sub-flow name="implementationSub_Flow"
+		doc:id="daf3fea6-658f-4d38-bd02-7f4b9a14ec19">
+		<logger level="INFO" doc:name="Logger"
+			doc:id="cf6ad0de-1dbd-4996-a4b6-74ebdbff3c28"
+			message="'payload type: #[typeOf(payload)] payload: #[write(payload, &quot;application/json&quot;)]'/&gt;" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="d86e7547-9433-46a2-a8f5-a25572c1f0b3">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+(payload default[] as Array)]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message"
+			doc:id="e1976825-3bf9-424c-b0c9-a45fb7c0f08e">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+ 
+// Ordena o array de contas alfabeticamente (case-insensitive),
+// garante que valores null são tratados como "".
+-&#45;&#45;
+payload orderBy $.name]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[[]]" doc:name="Set Variable"
+			doc:id="75b81bff-2889-43e2-a9b6-25b42b6e07cb"
+			variableName="insertedAccounts" />
+		<foreach doc:name="For Each"
+			doc:id="2a76eed5-8d4c-46bd-b3f9-635bb9d81551" collection="#[payload]">
+			<db:insert doc:name="Insert"
+				doc:id="dba0d388-9a1b-4f8d-bcf8-0b28c693ead7" target="dbResult">
+				<db:sql><![CDATA[INSERT INTO accounts (id, name, industry, country)
+VALUES (:id, :name, :industry, :country)]]></db:sql>
+				<db:input-parameters><![CDATA[#[%dw 2.0
+output application/java
+-&#45;&#45;
+{
+	id: payload.id,
+	name: payload.name,
+	industry: payload.industry,
+	country: payload.country
+}]]]></db:input-parameters>
+			</db:insert>
+			<set-variable
+				value="#[%dw 2.0&#10;output application/java&#10;// Acrescenta ao acumulador (insertedAccounts) em cada iteração:&#10;// Usa o payload atual (uma conta)&#10;// Preserva os valores enviados pelo cliente (id, name, country, status)&#10;// '++'concatena arrays e garante imutabilidade das vars&#10;-&#45;&#45;&#10;vars.insertedAccounts ++ [&#10;	{&#10;	    id: payload.id,&#10;	    name: payload.name,&#10;	    industry: payload.industry,&#10;	    country: payload.country&#10;	}&#10;]]"
+				doc:name="Set Variable"
+				doc:id="af976e0e-a1c1-4db2-84fa-ad0fe6900fe8"
+				variableName="insertedAccounts" />
+		</foreach>
+		<ee:transform doc:name="Transform Message"
+			doc:id="8c467e07-70f7-4367-b4a7-cc031b5198f4">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+-&#45;&#45;
+{
+	message: "Accounts inserted successfully",
+	totalInserted: sizeOf(vars.insertedAccounts),
+	accounts: vars.insertedAccounts
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="201" doc:name="Set Variable"
+			doc:id="1ea0aa43-9c21-430d-9989-0279b2a63fe3"
+			variableName="httpstatus" />
+	</sub-flow> -->
+	<sub-flow name="sapi-post-account"
+		doc:id="915770bc-20b5-4508-a169-373f1d5cddac">
+		<logger level="INFO" doc:name="Logger"
+			doc:id="3dd45d1b-497e-4649-b2b1-566f56b8d1f4"
+			message="'payload type: #[typeOf(payload)] payload: #[write(payload, &quot;application/json&quot;)]'/&gt;" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="6023404d-99cf-4eeb-a8bf-8d67aaac2e31">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{	
+	id: payload[0].id,
+    name: payload[0].name,
+    industry: payload[0].industry,
+    country: payload[0].country
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload.id]" doc:name="vai id"
+			doc:id="e2f0dacc-c20c-4b3b-871d-3724476849fb"
+			variableName="accountId" />
+		<db:insert doc:name="POST /insert account"
+			doc:id="4dbf51a1-7cfd-49c0-a8be-1c057b931978"
+			config-ref="accountdb_Config" queryTimeout="3000">
+			<db:sql><![CDATA[INSERT INTO accounts (id, name, industry, country)
+VALUES (:id, :name, :industry, :country);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{	
+	id: payload.id,
+    name: payload.name,
+    industry: payload.industry,
+    country: payload.country
+}]]]></db:input-parameters>
+		</db:insert>
+		<db:select doc:name="Retornar o post"
+			doc:id="5f1c741f-e8a2-4c53-8020-7fbe3537c62d"
+			config-ref="accountdb_Config">
+			<db:sql><![CDATA[Select * from accounts WHERE id = :id]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+  id: vars.accountId
+}]]]></db:input-parameters>
+		</db:select>
+		<ee:transform doc:name="Transform Message1"
+			doc:id="6990d55f-3b72-4242-87d5-d1891100ab08">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+    message: "Account created",
+    account: payload[0]
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="201" doc:name="set status"
+			doc:id="f80bc5bc-320e-4dc8-b257-2a11b89c66e9"
+			variableName="httpStatus" />
+	</sub-flow>
+	<sub-flow name="sapi-post-vehicles-flow"
+		doc:id="0cb09976-48ea-4d5e-90fb-e7750cee749d">
+		<logger level="DEBUG" doc:name="PostVehicleLog"
+			doc:id="2e174278-6172-40b5-aa17-3bcdff1794b6"
+			message="'payload type: #[typeOf(payload)] payload: #[write(payload, &quot;application/json&quot;)]'/&gt;" />
+		<ee:transform doc:name="Transform Message"
+			doc:id="90172287-518f-4732-8659-e81a025b976f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+	id: payload.id,
+	account_id: payload.account_id,
+	brand: payload.brand,
+	model: payload.model,
+	status: payload.status,
+	category: payload.category
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<db:insert doc:name="POST /insert Vehicles"
+			doc:id="39b99c9f-2775-462b-9ae6-fbb72b7efdcb"
+			config-ref="accountdb_Config" queryTimeout="30000">
+			<db:sql><![CDATA[INSERT INTO vehicles (id, account_id, brand, model, status, category)
+VALUES (:id, :account_id, :brand, :model, :status, :category);]]></db:sql>
+			<db:input-parameters><![CDATA[#[{
+id:payload.id,
+account_id: payload.account_id,
+brand: payload.brand,
+model: payload.model,
+status: payload.status,
+category: payload.category
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message1"
+			doc:id="7d3942f9-0550-4dbf-a711-148cc70c0efc">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+  message: "Vehicle created",
+  status: 201
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="201" doc:name="Set Status"
+			doc:id="d98eaa4b-9181-4aad-8f09-04e8d50b6f8e"
+			variableName="httpStatus" />
+	</sub-flow>
+</mule>
